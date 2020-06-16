@@ -1,14 +1,16 @@
 import React, { Component } from 'react';
 import './App.css';
-import Person from './Person/Person';
+import Deejay from './Deejay/Deejay';
 
 class App extends Component {
   state = {
     deejays: [
-      { name:'Ganu', exp:'4'},
-      { name:'Bob', exp:'2'},
-      { name:'Subbu', exp:'3'}
-    ]
+      { id:'asdf1', name:'Ganu', exp:'4'},
+      { id:'asdf2', name:'Bob', exp:'2'},
+      { id:'asdf3', name:'Subbu', exp:'3'}
+    ],
+    otherState: 'Something-Something',
+    showDeejays: false
   }
 
   switchNameHandler=(newName) =>{
@@ -22,42 +24,65 @@ class App extends Component {
     )
   }
 
-  namechangedHandler = (event) => {
-    this.setState({
-      deejays:[
-        {name:'Ganesh', exp:4},
-        {name:event.target.value, exp:2},
-        {name:'Subramaniam', exp:3}
-      ]
-    })
+  namechangedHandler = (event,id) => {
+   const deejayIndex= this.state.deejays.findIndex(p=>{
+     return p.id===id;
+   })
+   const deejay={
+     ...this.state.deejays[deejayIndex]
+   };
+   deejay.name=event.target.value;
+   const deejays= [...this.state.deejays];
+   deejays[deejayIndex]= deejay;
+   this.setState({deejays:deejays})
+  }
+
+  deleteDeejayHandler = (deejayIndex) => {
+    const deejays = [...this.state.deejays];
+    deejays.splice(deejayIndex,1);
+    this.setState({deejays: deejays});
+  }
+
+  toggleDeejaysHandler = () => {
+      const doesShow = this.state.showDeejays;
+      this.setState({showDeejays: !doesShow});
+
   }
 
 render() {
   const style = {
     backgroundColor: 'white',
     font: 'inherit',
-    border: '1px solid blue',
+    border: '2px solid blue',
     padding: '8px',
     cursor: 'pointer'
+  }
+  
+  let deejays = null
+
+  if (this.state.showDeejays){
+    deejays = (
+        <div>
+          {
+            this.state.deejays.map((deejay,index)=>{
+              return <Deejay
+                  click={()=>this.deleteDeejayHandler(index)}
+                  name={deejay.name}
+                  exp={deejay.exp}
+                  key={deejay.id}
+                  changed={(event)=>this.namechangedHandler(event,deejay.id)}/>
+            })
+          }
+        </div>
+    );
   }
     return (
       <div className="App">
         <h1>I'm an Albatraoz..!</h1>
-        <p>Vu-Vu..VU-VU-VU</p>
+        <p>Vu-Vu-Vu..VU-VU-VU</p>
         <button style = {style}
-          onClick={() => this.switchNameHandler('Ganesha!')}>Switch Name</button>
-        <Person 
-          name={this.state.deejays[0].name} 
-          exp={this.state.deejays[0].exp}/>
-        <Person 
-          name={this.state.deejays[1].name} 
-          exp={this.state.deejays[1].exp}
-          click={this.switchNameHandler.bind(this,'Bablya!')}
-          changed={this.namechangedHandler}
-          >My hobby is to sing loudly and badly</Person>
-        <Person 
-          name={this.state.deejays[2].name} 
-          exp={this.state.deejays[2].exp}/>
+          onClick={this.toggleDeejaysHandler}>Toggle DJ's</button>
+        {deejays}
       </div>
     );
   }
